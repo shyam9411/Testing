@@ -1,0 +1,312 @@
+import android.annotation.SuppressLint;
+import android.os.StrictMode;
+import android.util.Log;
+import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+/**
+* Created by h-pc on 16-Oct-15.
+*/
+public class ConnectionClass 
+{
+	String ip = "192.168.0.100";
+	String classs = "net.sourceforge.jtds.jdbc.Driver";
+	String db = "Andro";
+	String un = "hitesh";
+	String password = "789";
+	@SuppressLint("NewApi")
+	public Connection CONN() 
+	{
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
+		Connection conn = null;
+		String ConnURL = null;
+		try 
+		{
+			Class.forName(classs);
+			ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"+ "databaseName=" + db + ";user=" + un + ";password="+ password + ";";
+			conn = DriverManager.getConnection(ConnURL);
+		} 
+		catch (SQLException se)
+		{
+			Log.e("ERRO", se.getMessage());
+		} 
+		catch (ClassNotFoundException e)
+		{
+			Log.e("ERRO", e.getMessage());
+		} 
+		catch (Exception e) 
+		{
+			Log.e("ERRO", e.getMessage());
+		}
+	return conn;
+	}
+}
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+/*this is for the graph part*/
+//package com.example.graph;
+
+change the manifest and then add the jar file and dont forget to build the path
+
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.chart.BarChart.Type;
+import org.achartengine.model.CategorySeries;
+import org.achartengine.model.SeriesSelection;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.renderer.DefaultRenderer;
+import org.achartengine.renderer.SimpleSeriesRenderer;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.graphics.Color;
+import android.view.Menu;
+import android.view.View;
+import android.widget.Toast;
+
+public class MainActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        final GraphicalView mchartview;
+        int y[]={100,200,300,400,500};
+		CategorySeries ser=new CategorySeries("Bar graph");
+		for(int i=0;i<y.length;i++)
+			ser.add("Bar "+(i+1),y[i]);
+		int y1[]={10,20,30,40,50};
+		CategorySeries ser1=new CategorySeries("Bar graph 1");
+		for(int i=0;i<y1.length;i++)
+			ser1.add("Bar "+(i+1),y1[i]);
+		Toast.makeText(MainActivity.this, "hi",Toast.LENGTH_SHORT).show();
+		System.out.println("hello");
+		XYMultipleSeriesDataset ds=new XYMultipleSeriesDataset();
+		ds.addSeries(ser.toXYSeries());
+		ds.addSeries(ser1.toXYSeries());
+		XYMultipleSeriesRenderer mrender=new XYMultipleSeriesRenderer();
+		XYSeriesRenderer renderer=new XYSeriesRenderer();
+		renderer.setChartValuesSpacing((float)0.5);
+		renderer.setDisplayChartValues(true);
+		renderer.setColor(Color.RED);
+		XYSeriesRenderer renderer1=new XYSeriesRenderer();
+		renderer1.setChartValuesSpacing((float)0.5);
+		renderer1.setDisplayChartValues(true);
+		renderer1.setColor(Color.GREEN);
+		mrender.addSeriesRenderer(renderer);
+		mrender.addSeriesRenderer(renderer1);
+		mrender.setXTitle("X label");
+		mrender.setYTitle("Y label");
+		mrender.setClickEnabled(true);
+		mrender.setSelectableBuffer(10);
+		mrender.setZoomButtonsVisible(true);
+		//Intent intent=ChartFactory.getBarChartIntent(MainActivity.this, ds, mrender, Type.DEFAULT);
+		//startActivity(intent);
+		mchartview=(GraphicalView)ChartFactory.getBarChartView(getBaseContext(), ds, mrender,Type.DEFAULT);
+		mchartview.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				System.out.println("Clicked");
+				SeriesSelection ss=mchartview.getCurrentSeriesAndPoint();
+				double a=0;
+				if(ss!=null)
+					a=ss.getValue();
+				Toast.makeText(MainActivity.this, "Selected value is: "+a,Toast.LENGTH_SHORT).show();
+				if(a==200)
+				{
+				int[] val={1,2,3,4,5};
+				CategorySeries ds=new CategorySeries("Pie Chart");
+				int k=0;
+				for(int valu: val)
+					ds.add("Section "+ ++k,valu);
+				int[] colors={Color.BLUE,Color.RED,Color.BLACK,Color.GREEN,Color.YELLOW};
+				DefaultRenderer render=new DefaultRenderer();
+				for(int c:colors)
+				{
+					SimpleSeriesRenderer r=new SimpleSeriesRenderer();
+					r.setColor(c);
+					render.addSeriesRenderer(r);
+				}
+				render.setChartTitle("Pie title");
+				render.setZoomButtonsVisible(true);
+				render.setChartTitleTextSize(7);
+				GraphicalView mchartview1;
+				mchartview1=(GraphicalView)ChartFactory.getPieChartView(getBaseContext(), ds, render);
+				setContentView(mchartview1);
+				}
+				//System.out.println("Selected value is: "+a);
+			}
+		});
+		setContentView(mchartview);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+    
+}
+
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+/*Graph from local database*/
+
+added 
+	db openorcreate
+	db.setVersion
+	db.setLocale
+	db.execQuery
+	ContentView
+	cv.put
+	db.insert(table,null,cv)
+	db.rawQuery
+	cursor.getString(cursor.getColumnIndex())
+	db.close
+
+change the graph code accordingly
+
+package com.example.graph;
+
+import java.util.Locale;
+
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.chart.BarChart.Type;
+import org.achartengine.model.CategorySeries;
+import org.achartengine.model.SeriesSelection;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.renderer.DefaultRenderer;
+import org.achartengine.renderer.SimpleSeriesRenderer;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.view.Menu;
+import android.view.View;
+import android.widget.Toast;
+
+public class MainActivity extends Activity {
+SQLiteDatabase db;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        db=openOrCreateDatabase("sample.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+        db.setVersion(1);
+        db.setLocale(Locale.getDefault());
+        db.execSQL("CREATE TABLE IF NOT EXISTS hi(id INTEGER, name VARCHAR);");
+        ContentValues cv=new ContentValues();
+        cv.put("id","400".toString());
+        cv.put("name", "A".toString());
+        cv.put("id","300".toString());
+        cv.put("name", "B".toString());
+        long a=db.insert("hi", null, cv);
+        if(a==0)
+        	System.out.println("Didnt Insert");
+        final GraphicalView mchartview;
+        //int y[]={100,200,300,400,500};
+		CategorySeries ser=new CategorySeries("Bar graph");
+		//for(int i=0;i<y.length;i++)
+		//Cursor c=db.query("hi", null, null, null, null, null, null, null);
+		Cursor c=db.rawQuery("select * from hi",null);
+		c.moveToFirst();
+		while(c.isLast()==false)
+		{
+			ser.add(c.getString(c.getColumnIndex("name")),Double.valueOf(c.getString(c.getColumnIndex("id"))));
+			c.moveToNext();
+		}
+		/*int y1[]={10,20,30,40,50};
+		CategorySeries ser1=new CategorySeries("Bar graph 1");
+		for(int i=0;i<y1.length;i++)
+			ser1.add("Bar "+(i+1),y1[i]);
+		Toast.makeText(MainActivity.this, "hi",Toast.LENGTH_SHORT).show();*/
+		System.out.println("hello");
+		XYMultipleSeriesDataset ds=new XYMultipleSeriesDataset();
+		ds.addSeries(ser.toXYSeries());
+		//ds.addSeries(ser1.toXYSeries());
+		XYMultipleSeriesRenderer mrender=new XYMultipleSeriesRenderer();
+		XYSeriesRenderer renderer=new XYSeriesRenderer();
+		renderer.setChartValuesSpacing((float)0.5);
+		renderer.setDisplayChartValues(true);
+		renderer.setColor(Color.RED);
+		/*XYSeriesRenderer renderer1=new XYSeriesRenderer();
+		renderer1.setChartValuesSpacing((float)0.5);
+		renderer1.setDisplayChartValues(true);
+		renderer1.setColor(Color.GREEN);*/
+		mrender.addSeriesRenderer(renderer);
+		//mrender.addSeriesRenderer(renderer1);
+		mrender.setXTitle("X label");
+		mrender.setYTitle("Y label");
+		mrender.setClickEnabled(true);
+		mrender.setSelectableBuffer(10);
+		mrender.setZoomButtonsVisible(true);
+		//Intent intent=ChartFactory.getBarChartIntent(MainActivity.this, ds, mrender, Type.DEFAULT);
+		//startActivity(intent);
+		mchartview=(GraphicalView)ChartFactory.getBarChartView(getBaseContext(), ds, mrender,Type.DEFAULT);
+		mchartview.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				System.out.println("Clicked");
+				SeriesSelection ss=mchartview.getCurrentSeriesAndPoint();
+				double a=0;
+				if(ss!=null)
+					a=ss.getValue();
+				Toast.makeText(MainActivity.this, "Selected value is: "+a,Toast.LENGTH_SHORT).show();
+				if(a==200)
+				{
+				int[] val={1,2,3,4,5};
+				CategorySeries ds=new CategorySeries("Pie Chart");
+				int k=0;
+				for(int valu: val)
+					ds.add("Section "+ ++k,valu);
+				int[] colors={Color.BLUE,Color.RED,Color.BLACK,Color.GREEN,Color.YELLOW};
+				DefaultRenderer render=new DefaultRenderer();
+				for(int c:colors)
+				{
+					SimpleSeriesRenderer r=new SimpleSeriesRenderer();
+					r.setColor(c);
+					render.addSeriesRenderer(r);
+				}
+				render.setChartTitle("Pie title");
+				render.setZoomButtonsVisible(true);
+				render.setChartTitleTextSize(7);
+				GraphicalView mchartview1;
+				mchartview1=(GraphicalView)ChartFactory.getPieChartView(getBaseContext(), ds, render);
+				setContentView(mchartview1);
+				}
+				//System.out.println("Selected value is: "+a);
+			}
+		});
+		setContentView(mchartview);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+    
+}
